@@ -1,9 +1,7 @@
-import Navbar from './components/Navbar'
 import { useState, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
 function App() {
-
   const [todo, setTodo] = useState("")
   const [todos, setTodos] = useState([])
 
@@ -12,7 +10,6 @@ function App() {
     console.log("Loaded from localStorage:", savedTodos)
     setTodos(savedTodos)
   }, [])
-
 
   useEffect(() => {
     console.log("Saving to localStorage:", todos)
@@ -27,11 +24,9 @@ function App() {
     setTodos(todos.filter(item => item.id !== id))
   }
 
-
   const handleDelete = (e, id) => {
     setTodos(todos.filter(item => item.id !== id))
   }
-
 
   const handleChange = (e) => {
     setTodo(e.target.value)
@@ -51,33 +46,60 @@ function App() {
     setTodos(updatedTodos)
   }
 
-
   return (
-    <>
-      <Navbar />
-      <div className="container mx-auto my-5 p-5 bg-violet-100 min-h-[80vh]">
-        <div className="addTodo">
-          <h2 className='text-lg font-bold'>Add TODO</h2>
-          <input onChange={handleChange} value={todo} type="text" className='bg-white w-80' />
-          <button onClick={handleAdd} className='bg-violet-800 hover:bg-violet-600 p-2 py-1 text-sm text-white mx-6'>Add</button>
-        </div>
-        <h2 className='text-xl font-bold py-5'>Your TODOs</h2>
-        <div className="todos">
-          {todos.map(item => (
-            <div key={item.id} className="todo my-1 w-1/2 flex justify-between">
-              <div className='flex gap-3'>
-                <input onChange={handleCheckbox} type="checkbox" checked={item.isCompleted} name={item.id} id="" />
-                <div className={item.isCompleted ? "line-through" : ""}>{item.todo}</div>
-              </div>
-              <div className="buttons">
-                <button className='bg-violet-800 hover:bg-violet-600 p-2 py-1 text-sm text-white mx-1' onClick={(e) => { handleEdit(e, item.id) }}>Edit</button>
-                <button className='bg-violet-800 hover:bg-violet-600 p-2 py-1 text-sm text-white' onClick={(e) => { handleDelete(e, item.id) }}>Delete</button>
-              </div>
-            </div>
-          ))}
+    <div className="container mx-auto p-4 bg-violet-100 min-h-screen">
+      <div className="addTodo max-w-2xl mx-auto">
+        <h2 className='text-lg font-bold mb-2'>Add TODO</h2>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <input
+            onChange={handleChange}
+            value={todo}
+            type="text"
+            className='bg-white flex-1 px-3 py-2 border border-gray-300 rounded-md'
+            placeholder="Enter your task"
+          />
+          <button
+            onClick={handleAdd}
+            className='bg-violet-800 hover:bg-violet-600 px-4 py-2 text-sm text-white rounded-md'
+          >
+            Add
+          </button>
         </div>
       </div>
-    </>
+
+      <div className="todos max-w-2xl mx-auto mt-8">
+        <h2 className='text-xl font-bold pb-4'>Your TODOs</h2>
+        {todos.map(item => (
+          <div key={item.id} className="todo bg-white shadow-sm rounded-md p-3 mb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+            <div className='flex gap-3 items-center w-full sm:w-auto'>
+              <input
+                onChange={handleCheckbox}
+                type="checkbox"
+                checked={item.isCompleted}
+                name={item.id}
+              />
+              <div className={`break-words ${item.isCompleted ? "line-through text-gray-500" : ""}`}>
+                {item.todo}
+              </div>
+            </div>
+            <div className="buttons flex gap-2 mt-2 sm:mt-0">
+              <button
+                className='bg-violet-800 hover:bg-violet-600 px-3 py-1 text-sm text-white rounded-md'
+                onClick={(e) => handleEdit(e, item.id)}
+              >
+                Edit
+              </button>
+              <button
+                className='bg-violet-800 hover:bg-violet-600 px-3 py-1 text-sm text-white rounded-md'
+                onClick={(e) => handleDelete(e, item.id)}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
 
