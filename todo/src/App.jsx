@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { Edit3, Trash2, PlusCircle, Check, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -8,6 +8,7 @@ function App() {
   const [todos, setTodos] = useState([])
   const [showFinished, setShowFinished] = useState(true)
   const [toast, setToast] = useState({ show: false, message: "", type: "" })
+  const [editId, setEditId] = useState(null)
 
   useEffect(() => {
     const savedTodos = JSON.parse(localStorage.getItem("todos")) || []
@@ -15,11 +16,17 @@ function App() {
     setTodos(savedTodos)
   }, [])
 
+  const firstRender = useRef(true)
+
   useEffect(() => {
-    console.log("Saving to localStorage:", todos)
-    if (todos.length > 0) {
-      localStorage.setItem("todos", JSON.stringify(todos))
+    if (firstRender.current) {
+      firstRender.current = false
+      return
     }
+    const timeout = setTimeout(() => {
+      localStorage.setItem("todos", JSON.stringify(todos))
+    }, 300)
+    return () => clearTimeout(timeout)
   }, [todos])
 
   const showToast = (message, type = "success") => {
@@ -32,7 +39,7 @@ function App() {
   const handleEdit = (e, id) => {
     const t = todos.find(i => i.id === id)
     setTodo(t.todo)
-    setTodos(todos.filter(item => item.id !== id))
+    setEditId(id)
     showToast("Task ready for editing", "info")
   }
 
@@ -49,31 +56,40 @@ function App() {
 
   const handleAdd = () => {
     if (todo.trim() === "") return
-    setTodos([...todos, { id: uuidv4(), todo, isCompleted: false }])
+    if (editId) {
+      setTodos(todos.map(item =>
+        item.id === editId ? { ...item, todo } : item
+      ))
+      showToast("Task updated successfully", "info")
+      setEditId(null)
+    } else {
+      setTodos([...todos, { id: uuidv4(), todo, isCompleted: false }])
+      showToast("Task added successfully")
+    }
     setTodo("")
-    showToast("Task added successfully")
   }
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleAdd()
+    if (e.key === 'Enter') handleAdd()
+    if (e.key === 'Escape') {
+      setEditId(null)
+      setTodo("")
+      showToast("Edit cancelled", "info")
     }
   }
 
   const handleCheckbox = (e) => {
     const id = e.target.name
-    const updatedTodos = todos.map(item => {
-      if (item.id === id) {
-        const newStatus = !item.isCompleted
-        setTimeout(() => {
-          showToast(newStatus ? "Task marked as complete" : "Task marked as incomplete",
-            newStatus ? "success" : "info")
-        }, 300)
-        return { ...item, isCompleted: newStatus }
-      }
-      return item
-    })
+    const updatedTodos = todos.map(item =>
+      item.id === id ? { ...item, isCompleted: !item.isCompleted } : item
+    )
     setTodos(updatedTodos)
+
+    const changed = updatedTodos.find(item => item.id === id)
+    showToast(
+      changed.isCompleted ? "Task marked as complete" : "Task marked as incomplete",
+      changed.isCompleted ? "success" : "info"
+    )
   }
 
   const handleShowFinished = () => {
@@ -118,15 +134,28 @@ function App() {
       </div>
 
       <div className="todos max-w-2xl mx-auto mt-8">
-        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-4 cursor-pointer select-none">
-          <input
-            onChange={handleShowFinished}
-            type="checkbox"
-            checked={showFinished}
-            className="form-checkbox h-4 w-4 text-violet-800 rounded focus:ring-violet-500"
-          />
-          Show Finished Tasks
-        </label>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-6 mb-4">
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer select-none">
+            <input
+              onChange={handleShowFinished}
+              type="checkbox"
+              checked={showFinished}
+              className="form-checkbox h-4 w-4 text-violet-800 rounded focus:ring-violet-500"
+            />
+            Show Finished Tasks
+          </label>
+
+          <button
+            onClick={() => {
+              setTodos([])
+              localStorage.removeItem("todos")
+              showToast("All tasks cleared", "info")
+            }}
+            className="text-sm text-red-600 underline hover:text-red-800 transition-colors"
+          >
+            Clear All Tasks
+          </button>
+        </div>
 
         <h2 className='text-xl font-bold pb-4'>Your TODOs</h2>
 
@@ -137,8 +166,8 @@ function App() {
               variants={todoVariants}
               initial="hidden"
               animate="visible"
+              aria-live="assertive"
               exit="exit"
-              layout
               className="todo bg-white shadow-sm rounded-md p-3 mb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center">
               <div className='flex gap-3 items-center w-full sm:w-auto'>
                 <input
@@ -188,6 +217,7 @@ function App() {
             initial="hidden"
             animate="visible"
             exit="exit"
+            aria-live="assertive"
             variants={toastVariants}
             className={`fixed bottom-4 right-4 max-w-xs sm:max-w-sm break-words text-sm flex items-center gap-2 p-3 rounded-md shadow-lg ${toast.type === 'error' ? 'bg-red-100 text-red-800' :
               toast.type === 'info' ? 'bg-blue-100 text-blue-800' :
