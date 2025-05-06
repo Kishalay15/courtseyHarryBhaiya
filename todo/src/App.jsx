@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 function App() {
   const [todo, setTodo] = useState("")
   const [todos, setTodos] = useState([])
+  const [showFinished, setShowFinished] = useState(true)
 
   useEffect(() => {
     const savedTodos = JSON.parse(localStorage.getItem("todos")) || []
@@ -46,6 +47,10 @@ function App() {
     setTodos(updatedTodos)
   }
 
+  const handleShowFinished = () => {
+    setShowFinished(!showFinished)
+  }
+
   return (
     <div className="container mx-auto p-4 bg-violet-100 min-h-screen">
       <div className="addTodo max-w-2xl mx-auto">
@@ -55,7 +60,7 @@ function App() {
             onChange={handleChange}
             value={todo}
             type="text"
-            className='bg-white flex-1 px-3 py-2 border border-gray-300 rounded-md'
+            className='w-full bg-white flex-1 px-3 py-2 border border-gray-300 rounded-md'
             placeholder="Enter your task"
           />
           <button
@@ -68,8 +73,18 @@ function App() {
       </div>
 
       <div className="todos max-w-2xl mx-auto mt-8">
+        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-4 cursor-pointer select-none">
+          <input
+            onChange={handleShowFinished}
+            type="checkbox"
+            checked={showFinished}
+            className="form-checkbox h-4 w-4 text-violet-800 rounded focus:ring-violet-500"
+          />
+          Show Finished Tasks
+        </label>
+
         <h2 className='text-xl font-bold pb-4'>Your TODOs</h2>
-        {todos.map(item => (
+        {todos.map(item => (showFinished || !item.isCompleted) && (
           <div key={item.id} className="todo bg-white shadow-sm rounded-md p-3 mb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center">
             <div className='flex gap-3 items-center w-full sm:w-auto'>
               <input
@@ -78,7 +93,7 @@ function App() {
                 checked={item.isCompleted}
                 name={item.id}
               />
-              <div className={`break-words ${item.isCompleted ? "line-through text-gray-500" : ""}`}>
+              <div className={`w-full sm:w-auto break-words ${item.isCompleted ? "line-through text-gray-500" : ""}`}>
                 {item.todo}
               </div>
             </div>
