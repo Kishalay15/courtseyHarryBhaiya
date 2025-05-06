@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="25" y="35" width="150" height="130" rx="15" ry="15" fill="#9b59b6" />
+  <rect x="35" y="45" width="130" height="110" rx="10" ry="10" fill="#f8f0ff" />
+
+  <!-- Header Bar -->
+  <rect x="35" y="45" width="130" height="25" rx="10" ry="10" fill="#8e44ad" />
+
+  <!-- Todo Lines -->
+  <line x1="55" y1="90" x2="145" y2="90" stroke="#d8bfd8" stroke-width="4" stroke-linecap="round" />
+  <line x1="55" y1="115" x2="145" y2="115" stroke="#d8bfd8" stroke-width="4" stroke-linecap="round" />
+  <line x1="55" y1="140" x2="145" y2="140" stroke="#d8bfd8" stroke-width="4" stroke-linecap="round" />
+
+  <!-- Checkboxes -->
+  <rect x="45" y="83" width="14" height="14" rx="2" ry="2" fill="none" stroke="#8e44ad" stroke-width="2" />
+
+  <rect x="45" y="108" width="14" height="14" rx="2" ry="2" fill="none" stroke="#8e44ad" stroke-width="2" />
+  <path d="M47,115 L52,120 L57,110" stroke="#8e44ad" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+
+  <rect x="45" y="133" width="14" height="14" rx="2" ry="2" fill="#8e44ad" stroke="#8e44ad" stroke-width="2" />
+  <path d="M47,140 L52,145 L57,135" stroke="#f8f0ff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Three Dots Menu -->
+  <circle cx="150" cy="57" r="2.5" fill="#f8f0ff" />
+  <circle cx="140" cy="57" r="2.5" fill="#f8f0ff" />
+  <circle cx="130" cy="57" r="2.5" fill="#f8f0ff" />
+</svg>
