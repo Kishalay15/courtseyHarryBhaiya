@@ -66,6 +66,7 @@ function App() {
             placeholder="Enter your task"
           />
           <button
+            title="Add Task"
             onClick={handleAdd}
             className='bg-violet-800 hover:bg-violet-600 p-2 sm:px-4 sm:py-2 text-white rounded-md flex items-center justify-center'
             aria-label="Add Task"
@@ -104,6 +105,7 @@ function App() {
             </div>
             <div className="buttons flex gap-2 mt-2 sm:mt-0">
               <button
+                title="Edit Task"
                 className='bg-violet-800 hover:bg-violet-600 p-2 text-white rounded-md'
                 onClick={(e) => handleEdit(e, item.id)}
                 aria-label="Edit"
@@ -112,6 +114,7 @@ function App() {
                 <span className="hidden sm:inline text-sm">Edit</span>
               </button>
               <button
+                title="Delete Task"
                 className='bg-violet-800 hover:bg-violet-600 p-2 text-white rounded-md'
                 onClick={(e) => handleDelete(e, item.id)}
                 aria-label="Delete"
