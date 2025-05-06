@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
+import { Edit3, Trash2, PlusCircle } from 'lucide-react'
+
 
 function App() {
   const [todo, setTodo] = useState("")
@@ -65,10 +67,13 @@ function App() {
           />
           <button
             onClick={handleAdd}
-            className='bg-violet-800 hover:bg-violet-600 px-4 py-2 text-sm text-white rounded-md'
+            className='bg-violet-800 hover:bg-violet-600 p-2 sm:px-4 sm:py-2 text-white rounded-md flex items-center justify-center'
+            aria-label="Add Task"
           >
-            Add
+            <PlusCircle size={20} className="sm:hidden" />
+            <span className="hidden sm:inline text-sm">Add</span>
           </button>
+
         </div>
       </div>
 
@@ -99,16 +104,20 @@ function App() {
             </div>
             <div className="buttons flex gap-2 mt-2 sm:mt-0">
               <button
-                className='bg-violet-800 hover:bg-violet-600 px-3 py-1 text-sm text-white rounded-md'
+                className='bg-violet-800 hover:bg-violet-600 p-2 text-white rounded-md'
                 onClick={(e) => handleEdit(e, item.id)}
+                aria-label="Edit"
               >
-                Edit
+                <Edit3 size={16} className="sm:hidden" />
+                <span className="hidden sm:inline text-sm">Edit</span>
               </button>
               <button
-                className='bg-violet-800 hover:bg-violet-600 px-3 py-1 text-sm text-white rounded-md'
+                className='bg-violet-800 hover:bg-violet-600 p-2 text-white rounded-md'
                 onClick={(e) => handleDelete(e, item.id)}
+                aria-label="Delete"
               >
-                Delete
+                <Trash2 size={16} className="sm:hidden" />
+                <span className="hidden sm:inline text-sm">Delete</span>
               </button>
             </div>
           </div>
