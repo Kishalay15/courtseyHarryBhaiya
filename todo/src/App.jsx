@@ -311,7 +311,7 @@ function App() {
             rel="noopener noreferrer"
             className="text-gray-400 hover:text-violet-600 transition-colors"
           >
-            Kishalay Lahiri
+            Kishalay
           </a>
         </span>
       </footer>
