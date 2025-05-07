@@ -1,6 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import { Edit3, Trash2, PlusCircle, Check, X } from 'lucide-react'
+import {
+  Check,
+  Pencil,
+  PlusCircle,
+  Trash,
+  X,
+  Edit3
+} from "lucide-react"
 import { motion, AnimatePresence } from 'framer-motion'
 
 function App() {
@@ -9,6 +16,7 @@ function App() {
   const [showFinished, setShowFinished] = useState(true)
   const [toast, setToast] = useState({ show: false, message: "", type: "" })
   const [editId, setEditId] = useState(null)
+  const [editingTodos, setEditingTodos] = useState({})
 
   useEffect(() => {
     const savedTodos = JSON.parse(localStorage.getItem("todos")) || []
@@ -29,6 +37,37 @@ function App() {
     return () => clearTimeout(timeout)
   }, [todos])
 
+  const startEdit = (id, currentText) => {
+    setEditingTodos(prev => ({
+      ...prev,
+      [id]: { text: currentText }
+    }))
+  }
+
+  const cancelEdit = (id) => {
+    setEditingTodos(prev => {
+      const updated = { ...prev }
+      delete updated[id]
+      return updated
+    })
+    showToast("Edit cancelled", "info")
+  }
+
+  const saveEdit = (id) => {
+    const newText = editingTodos[id]?.text?.trim()
+    if (!newText) return
+    setTodos(todos.map(item =>
+      item.id === id ? { ...item, todo: newText } : item
+    ))
+    setEditingTodos(prev => {
+      const updated = { ...prev }
+      delete updated[id]
+      return updated
+    })
+    showToast("Task updated successfully", "info")
+  }
+
+
   const showToast = (message, type = "success") => {
     setToast({ show: true, message, type })
     setTimeout(() => {
@@ -36,15 +75,7 @@ function App() {
     }, 3000)
   }
 
-  const handleEdit = (e, id) => {
-    const t = todos.find(i => i.id === id)
-    setTodo(t.todo)
-    setEditId(id)
-    showToast("Task ready for editing", "info")
-  }
-
   const handleDelete = (e, id) => {
-    // setTodos(todos.filter(item => item.id !== id))
     const todoText = todos.find(item => item.id === id)?.todo
     setTodos(todos.filter(item => item.id !== id))
     showToast(`"${todoText.substring(0, 20)}${todoText.length > 20 ? '...' : ''}" deleted`, "error")
@@ -96,6 +127,11 @@ function App() {
     setShowFinished(!showFinished)
   }
 
+  const handleEditKeyDown = (e, id) => {
+    if (e.key === "Enter") saveEdit(id)
+    if (e.key === "Escape") cancelEdit(id)
+  }
+
   const todoVariants = {
     hidden: { opacity: 0, height: 0, marginBottom: 0 },
     visible: { opacity: 1, height: "auto", marginBottom: "0.75rem" },
@@ -134,16 +170,17 @@ function App() {
       </div>
 
       <div className="todos max-w-2xl mx-auto mt-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-6 mb-4">
-          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer select-none">
-            <input
-              onChange={handleShowFinished}
-              type="checkbox"
-              checked={showFinished}
-              className="form-checkbox h-4 w-4 text-violet-800 rounded focus:ring-violet-500"
-            />
-            Show Finished Tasks
-          </label>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-6 mb-6 px-4 py-3 rounded-md">
+          <button
+            onClick={handleShowFinished}
+            className={`flex items-center gap-2 text-sm font-medium px-3 py-1.5 rounded-md border transition-colors
+      ${showFinished
+                ? "bg-violet-800 text-white border-violet-800 hover:bg-violet-700"
+                : "bg-white text-gray-700 border-gray-300 hover:bg-violet-50"}
+    `}
+          >
+            {showFinished ? "Hide Finished Tasks" : "Show Finished Tasks"}
+          </button>
 
           <button
             onClick={() => {
@@ -151,11 +188,12 @@ function App() {
               localStorage.removeItem("todos")
               showToast("All tasks cleared", "info")
             }}
-            className="text-sm text-red-600 underline hover:text-red-800 transition-colors"
+            className="text-sm text-red-600 hover:text-white hover:bg-red-600 border border-red-600 rounded-md px-3 py-1 transition-colors"
           >
             Clear All Tasks
           </button>
         </div>
+
 
         <h2 className='text-xl font-bold pb-4'>Your TODOs</h2>
 
@@ -178,29 +216,60 @@ function App() {
                   className="form-checkbox h-5 w-5 text-violet-800 rounded focus:ring-violet-500 transition-all"
                   aria-label={`Mark "${item.todo}" as ${item.isCompleted ? 'incomplete' : 'complete'}`}
                 />
-                <div className={`w-full sm:w-auto break-words ${item.isCompleted ? "line-through text-gray-500" : ""}`}>
-                  {item.todo}
-                </div>
+                {editingTodos[item.id] ? (
+                  <input
+                    type="text"
+                    value={editingTodos[item.id].text}
+                    onChange={e => setEditingTodos(prev => ({
+                      ...prev,
+                      [item.id]: { text: e.target.value }
+                    }))}
+                    onKeyDown={(e) => handleEditKeyDown(e, item.id)}
+                    className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    autoFocus
+                  />
+                ) : (
+                  <div className={`w-full sm:w-auto break-words ${item.isCompleted ? "line-through text-gray-500" : ""}`}>
+                    {item.todo}
+                  </div>
+                )}
               </div>
               <div className="buttons flex gap-2 mt-2 sm:mt-0">
-                <button
-                  title="Edit Task"
-                  className='bg-violet-800 hover:bg-violet-600 p-2 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-colors'
-                  onClick={(e) => handleEdit(e, item.id)}
-                  aria-label={`Edit "${item.todo}"`}
-                >
-                  <Edit3 size={16} className="sm:hidden" />
-                  <span className="hidden sm:inline text-sm">Edit</span>
-                </button>
-                <button
-                  title="Delete Task"
-                  className='bg-violet-800 hover:bg-violet-600 p-2 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-colors'
-                  onClick={(e) => handleDelete(e, item.id)}
-                  aria-label={`Delete "${item.todo}"`}
-                >
-                  <Trash2 size={16} className="sm:hidden" />
-                  <span className="hidden sm:inline text-sm">Delete</span>
-                </button>
+                {editingTodos[item.id] ? (
+                  <>
+                    <button
+                      title="Save Task"
+                      onClick={() => saveEdit(item.id)}
+                      className="bg-green-600 hover:bg-green-500 p-2 text-white rounded-md transition-colors"
+                    >
+                      <Check size={16} />
+                    </button>
+                    <button
+                      title="Cancel Edit"
+                      onClick={() => cancelEdit(item.id)}
+                      className="bg-gray-500 hover:bg-gray-400 p-2 text-white rounded-md transition-colors"
+                    >
+                      <X size={16} />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      title="Edit Task"
+                      onClick={() => startEdit(item.id, item.todo)}
+                      className="bg-violet-800 hover:bg-violet-600 p-2 text-white rounded-md transition-colors"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      title="Delete Task"
+                      onClick={(e) => handleDelete(e, item.id)}
+                      className="bg-violet-800 hover:bg-violet-600 p-2 text-white rounded-md transition-colors"
+                    >
+                      <Trash size={16} />
+                    </button>
+                  </>
+                )}
               </div>
             </motion.div>
           ))}
