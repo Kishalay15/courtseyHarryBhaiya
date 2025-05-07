@@ -304,7 +304,7 @@ function App() {
       </AnimatePresence>
       <footer className="text-center text-gray-400 text-xs py-6">
         <span>
-          Built with <span className="text-red-400">❤️</span> by{" "}
+          Built with <span className="text-violet-700">💜</span> by{" "}
           <a
             href="https://personal-portfolio-wheat-kappa.vercel.app/"
             target="_blank"
