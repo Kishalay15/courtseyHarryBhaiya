@@ -302,6 +302,19 @@ function App() {
           </motion.div>
         )}
       </AnimatePresence>
+      <footer className="text-center text-gray-400 text-xs py-6">
+        <span>
+          Built with <span className="text-red-400">❤️</span> by{" "}
+          <a
+            href="https://personal-portfolio-wheat-kappa.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-400 hover:text-violet-600 transition-colors"
+          >
+            Kishalay Lahiri
+          </a>
+        </span>
+      </footer>
     </div>
   )
 }
