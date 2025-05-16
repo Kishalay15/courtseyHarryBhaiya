@@ -39,3 +39,7 @@ cd todo-localstorage
 npm install
 # or
 yarn install
+
+---
+
+Created with 💜 for by [Kishalay](https://personal-portfolio-wheat-kappa.vercel.app/)
